@@ -118,7 +118,7 @@ public class RSOPGroups
 					{
 						foreach (ManagementObject rsop_session in rsop_sessions)
 						{
-							if (ret == null) ret = new Dictionary<String, String>();
+							if (ret == null) ret = new Dictionary<String, String>(StringComparer.InvariantCultureIgnoreCase);
 
 							foreach (PropertyData prop in rsop_session.Properties)
 							{
@@ -163,21 +163,25 @@ public class RSOPGroups
 
 	process
 	{
+		$groups = $null
+
 		if($User -eq $true)
 		{
 			$groups = [RSOPGroups]::GetRSOPGroups([RSOPGroups+RSOPRetrieveType]::User, $UserSID)
-			if($groups -eq $null)
-			{
-				$null
-			}
-			else
-			{
-				[System.Collections.Hashtable]::new()
-			}
 		}
 		else
 		{
-			[System.Collections.Hashtable]::new([RSOPGroups]::GetRSOPGroups([RSOPGroups+RSOPRetrieveType]::Computer))
+			$groups = [RSOPGroups]::GetRSOPGroups([RSOPGroups+RSOPRetrieveType]::Computer)
+		}
+		
+		
+		if($groups -eq $null)
+		{
+			$null
+		}
+		else
+		{
+			$ret = [System.Collections.Hashtable]::new($groups)
 		}
 	}
 }
